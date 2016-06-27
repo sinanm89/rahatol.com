@@ -1,0 +1,27 @@
+server {
+    listen 80 default_server;
+    server_name rahatol.com;
+
+    root /var/www/rahatol.com/;
+
+    location / {
+#                proxy_pass http://127.0.0.1:8000;
+#                proxy_set_header X-Forwarded-Host $server_name;
+#                proxy_set_header X-Real-IP $remote_addr;
+#                add_header P3P 'CP="ALL DSP COR PSAa PSDa OUR NOR ONL UNI COM NAV"';
+#	index /var/www/rahatol.com/index.html;
+	try_files $uri $uri/index.html;
+
+        }
+
+    location /static/ {
+        autoindex on;
+        alias /var/www/rahatol.com/static/;
+    }
+    
+    location /pi/ {
+        root ~/pi/;
+        index index.html;
+    }
+}
+
