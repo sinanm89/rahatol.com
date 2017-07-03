@@ -74,7 +74,6 @@ function choose_direction(i){
     var next_index;
     var direction = legal_directions.splice(Math.floor(Math.random()*legal_directions.length), 1);
 
-    // fill_maze(0);
     while(legal_directions.length > 0) {
         // direction = Math.floor(Math.random()*directions.length);
         next_index = i + directions[direction];
@@ -93,11 +92,12 @@ function choose_direction(i){
         else {
             for(var k=0; k < directions.length; k++){
                 var wall_index = i + directions[k];
-                if (wall_index === direction || wall_index === i || visited[wall_index] || walls[wall_index]) continue;
+                if (wall_index === next_index || wall_index === i || visited[wall_index] || walls[wall_index]) continue;
                 walls[wall_index] = true;
                 fill_wall(wall_index);
-        }
+
             return next_index;
+            }
         }
     }
     if (previous.length > 0) return choose_direction(previous.pop());
