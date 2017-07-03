@@ -93,7 +93,7 @@ function choose_direction(i){
         else {
             for(var k=0; k < directions.length; k++){
                 var wall_index = i + directions[k];
-                if (k === direction || walls[wall_index] || visited[wall_index]) continue;
+                if (wall_index === direction || wall_index === i || visited[wall_index] || walls[wall_index]) continue;
                 walls[wall_index] = true;
                 fill_wall(wall_index);
         }
