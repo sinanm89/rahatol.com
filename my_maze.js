@@ -1,95 +1,107 @@
+"use strict";
 // d3.timer(_ticker);
 // var w = window.innerWidth;
 // var h = window.innerHeight;
-var w = 200;
-var h = 200;
 
-var canvas = d3.select("body").append("canvas")
-    .attr("width", w)
-    .attr("height", h);
-var context = canvas.node().getContext("2d");
 
-cell_size = 4
+// context.fillRect(100, 100, 220,220);
 // cell_spacing = 4
 
 // cellWidth = Math.floor((w - cell_spacing)/(cell_size+cell_spacing))
 // cellHeight = Math.floor((h - cell_spacing)/(cell_size+cell_spacing))
 
-context.fillStyle = "#fff";
-function create_maze(w, h) {
-    graph = prims_generate_graph(w, h);
-    return graph
+var w = 100;
+var h = 100;
+
+// var _blocks = 10000
+
+var N = 0,
+    E = 1,
+    S = 2,
+    W = 3;
+
+var directions = [-w, +1, +w, -1];
+
+var cell_size = 10;
+
+var canvas = d3.select("body").append("canvas")
+    .attr("width", w*cell_size)
+    .attr("height", h*cell_size);
+var context = canvas.node().getContext("2d");
+
+var walls = Array(w*h);
+var visited = Array(w*h);
+var previous = [];
+
+function fill_maze(i) {
+    // var x = i % cellWidth, y = i / cellWidth | 0;
+    var x_0 = (i%w) * cell_size;
+    var y_0 = Math.floor(i/h) * cell_size;
+    context.fillRect(x_0, y_0, cell_size, cell_size);
 }
 
-maze = create_maze(w, h)
+function fill_maze(i) {
+    // var x = i % cellWidth, y = i / cellWidth | 0;
+    context.fillStyle = "#fff";
+    var x_0 = (i%w) * cell_size;
+    var y_0 = Math.floor(i/h) * cell_size;
+    context.fillRect(x_0, y_0, cell_size, cell_size);
+}
 
-function Cell(index) {
-    this.i = index;
-    this.walls = [true, true, true, true];
-
-    this.check_neighbors = function() {
-//      0  1  2  3  4   5x3
-//     +--+--+--+--+--+
-//   0  0 |         4 |
-//     +  +  +--+--+  +
-//   1 |5 |6    |  |9 |
-//     +  +--+  +  +--+
-//   2 |10          14|
-//     +--+--+--+--+  +
-// i=2
-
-        // horizontal bias
-        for (i=0; i < this.walls.length; i++) {
-            // top edge detect
-            if (i === 0 && this.i < w) continue;
-            // right edge detect
-            if (i === 1 && this.i+1 % w == 0) continue;
-            // bottom edge detect
-            if (i === 2 && this.i+w > w*h) continue;
-            // left edge detect
-            if (i === 3 && this.i % w == 0) continue;
-            // if (!this.walls) return i;
-        }
-        return i;
-    }
-    return this;
+function fill_wall(i) {
+    // var x = i % cellWidth, y = i / cellWidth | 0;
+    context.fillStyle = "#f00";
+    var x_0 = (i%w) * cell_size;
+    var y_0 = Math.floor(i/h) * cell_size;
+    context.fillRect(x_0, y_0, cell_size, cell_size);
 }
 
 function prims_generate_graph(w, h) {
-    // var cells = Array(w*h);
-    var visited = Array();
-    // var previous = new Array(cells.length);
-    cell = Cells
-    direction = Math.floor(Math.random()*4);
 
-    for (var i=0; i < cells.length; i++) {
-        current = Cells(i)
-        // direction = current.check_neighbors();
-        // select a legal direction
-        fill_cell(i);
-        if (direction) {
-            console.log(direction);
-            visited.push(current);
-            continue;
-        }
-        visited.pop();
-
+    var current = (Math.floor(h/2) * w) + Math.floor(w/2) - 1;
+    while (current) {
+        fill_maze(current);
+        visited[current] = true;
+        previous.push(current);
+        current = choose_direction(current);
     }
-}
-function fill_cell(i) {
-    // var x = i % cellWidth, y = i / cellWidth | 0;
-    context.fillRect(
-        // horiz
-        // cell_size
-        (i%w+1)*(cell_size),
-        // vert
-        (i%w)*(cell_size),
-        // x * cellSize + (x + 1) * cellSpacing, y * cellSize + (y + 1) * cellSpacing,
-        // i%w)*(cell_spacing+cell_size)
-        cell_size, cell_size
-    );
+
+    return visited;
 }
 
-// function _ticker(elapsed) {
-//     // timer_elapsed = _elapsed;
-// }
+function choose_direction(i){
+    var legal_directions = [N, E, S, W];
+    var next_index;
+    var direction = legal_directions.splice(Math.floor(Math.random()*legal_directions.length), 1);
+
+    // fill_maze(0);
+    while(legal_directions.length > 0) {
+        // direction = Math.floor(Math.random()*directions.length);
+        next_index = i + directions[direction];
+        direction = legal_directions.splice(Math.floor(Math.random()*legal_directions.length), 1)[0];
+        if (!direction) {
+            console.log('for i ' + i +' no directions left');
+            break;
+        }
+        // N edge
+        else if (visited[next_index] || walls[next_index]) {
+            console.log(visited[next_index]);
+            console.log(walls[next_index]);
+            continue;}
+        else if (next_index < w || next_index % w === 0 || next_index > w*h) continue;
+        // not in visited or not a permanent wall
+        else {
+            for(var k=0; k < directions.length; k++){
+                var wall_index = i + directions[k];
+                if (k === direction || walls[wall_index] || visited[wall_index]) continue;
+                walls[wall_index] = true;
+                fill_wall(wall_index);
+        }
+            return next_index;
+        }
+    }
+    if (previous.length > 0) return choose_direction(previous.pop());
+    else return false;
+}
+
+prims_generate_graph(w, h);
