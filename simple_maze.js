@@ -1,7 +1,7 @@
 "use strict";
 
-var w = 50;
-var h = 50;
+var w = 200;
+var h = 200;
 
 var pixel_width = w * cell_size*100;
 var pixel_height = w * cell_size*100;
@@ -24,7 +24,6 @@ var maybe_maze = {
 
 
 function fill_maze(i) {
-  // var x = i % cellWidth, y = i / cellWidth | 0;
   context.fillStyle = "#fff";
   var x_0 = (i%w) * cell_size;
   var y_0 = Math.floor(i/h) * cell_size;
@@ -32,15 +31,13 @@ function fill_maze(i) {
 }
 
 function fill_wall(i) {
-  // var x = i % cellWidth, y = i / cellWidth | 0;
-  context.fillStyle = "#f00";
+  context.fillStyle = "#000";
   var x_0 = (i%w) * cell_size;
   var y_0 = Math.floor(i/h) * cell_size;
   context.fillRect(x_0, y_0, cell_size, cell_size);
 }
 
 function fill_maybe_maze(i) {
-  // var x = i % cellWidth, y = i / cellWidth | 0;
   context.fillStyle = "#00f";
   var x_0 = (i%w) * cell_size;
   var y_0 = Math.floor(i/h) * cell_size;
@@ -113,3 +110,5 @@ function choose_next_index(current_index){
 }
 
 prims_generate_graph(w, h);
+
+
