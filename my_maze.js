@@ -58,7 +58,7 @@ function fill_wall(i) {
 
 function prims_generate_graph(w, h) {
 
-    var current = (Math.floor(h/2) * w) + Math.floor(w/2) - 1;
+    var current = (Math.floor(h/2) * w) + Math.floor(w/2);
     while (current) {
         fill_maze(current);
         visited[current] = true;
