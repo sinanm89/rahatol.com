@@ -33,7 +33,6 @@ var context = canvas.node().getContext("2d");
 var walls = Array(w*h);
 var maybe_maze = Array(w*h);
 var visited = Array(w*h);
-var remaining = Array(w*h);
 var previous = [];
 
 function fill_maze(i) {
@@ -60,7 +59,47 @@ function fill_maybe_maze(i) {
   context.fillRect(x_0, y_0, cell_size, cell_size);
 }
 
+//
 
+function check_maybe_maze(index) {
+  // check to see if a maybe cell exists
+  if (maybe_stats[index]) {
+    walls[index] = true;
+    return true;
+  }
+  return false;
+}
+
+// function add_maybe_walls(current_index) {
+//   // add maybe maze
+//   var maybe_maze_index;
+//   for (var j=0; j< directions.length; j++) {
+//     maybe_maze_index = current_index + directions[j];
+//     if (walls[maybe_maze_index] || visited[maybe_maze_index]) {continue;}
+//     else if (!check_maybe_maze(maybe_maze_index)) {
+//       fill_maybe_maze(maybe_maze_index);
+//       maybe_maze.push(maybe_maze_index);
+//     }
+//   }
+// }
+
+// //
+
+function add_maybe_walls(current_index) {
+  // add maybe maze
+  var maybe_maze_index;
+  for (var j=0; j< directions.length; j++) {
+    maybe_maze_index = current_index + directions[j];
+    if (walls[maybe_maze_index] || visited[maybe_maze_index]) continue;
+    if (maybe_maze[maybe_maze_index]) {
+      walls[maybe_maze_index] = true;
+      fill_wall(maybe_maze_index);
+    } else {
+      fill_maybe_maze(maybe_maze_index);
+      maybe_maze[maybe_maze_index] = true;
+    }
+  }
+}
 
 function prims_generate_graph(w, h) {
 
@@ -69,55 +108,67 @@ function prims_generate_graph(w, h) {
 
   while (current_i) {
       fill_maze(current_i);
-      var node = {
-          parent: previous[previous.length - 1],
-          index: current_i
-      };
-      visited[node.index] = node;
-      // previous.push(current_i);
-      current_i = choose_next_index(current_i, node);
-      // while we dont have a cell to go to, select random wall
-      while (current_i === null){
-          current_i = maybe_maze.splice(Math.floor(Math.random()*maybe_maze.length), 1)[0];
-      }
+      visited[current_i] = true;
+      add_maybe_walls(current_i);
+      current_i = choose_next_index(current_i);
   }
   return visited;
 }
 
+function check_edges(index) {
+  if (index < w || index % w === 0 || index > w*h ) {
+    fill_wall(index);
+    walls[index] = true;
+    return true;
+  }
+  return false;
+}
+
 function choose_next_index(current_index){
   var legal_directions = [-w, +1, +w, -1];
-  // legal_directions.push(false);
-  var next_index;
-  var maybe_maze_index;
-  var maybe_direction = direction;
+  var next_index = null;
   var direction;
-  while(legal_directions.length > 0) {
-      // pop a random legal direction from the list of directions left on the node.
-      // TODO: add switcher direction case to legal_directions
-      direction = legal_directions.splice(Math.floor(Math.random()*legal_directions.length), 1)[0];
-      maybe_direction = direction;
-      if (!direction) break;
-      next_index = current_index + direction;
-      // edge cases and if the next chosen index is in an unmutable wall or visited ; continue
-      if (next_index < w || next_index % w === 0 || next_index > w*h ) {
-          fill_wall(next_index);
-          walls[next_index] = true;
-          continue;
-      } else if (walls[next_index] || visited[next_index]) continue;
-
-      // add maybe maze
-      while (maybe_direction) {
-          maybe_direction = legal_directions.pop();
-          maybe_maze_index = current_index + maybe_direction;
-          if (walls[maybe_maze_index] || visited[maybe_maze_index]) continue;
-          maybe_maze[maybe_maze_index] = maybe_maze_index;
-          fill_maybe_maze(maybe_maze_index);
-      }
-      return next_index;
-    }
+  var random_maybe_index = Math.floor(Math.random()*maybe_maze.length);
+  // pop a random legal direction from the list of directions left on the node.
+  // TODO: add switcher direction case to legal_directions
+  while (legal_directions.length > 0) {
+    direction = legal_directions.splice(Math.floor(Math.random()*legal_directions.length), 1)[0];
+    if (!direction) {
+      next_index = maybe_maze[random_maybe_index];
+    } else next_index = current_index + direction;
+    // edge cases and if the next chosen index is in an unmutable wall or visited ; continue
+    if (check_edges(next_index) || walls[next_index] || visited[next_index]) {continue;}
+    else return next_index;
+  }
   // if we run out of legal directions get a random from maybe maze.
-  // maybe_maze_index = maybe_maze.splice(Math.floor(Math.random()*maybe_maze.length), 1)[0];
-  return null;
+  random_maybe_index = Math.floor(Math.random()*maybe_maze.length);
+  next_index = maybe_maze[random_maybe_index];
+  // maybe_maze[random_maybe_index] = false
+  return next_index;
 }
 
 prims_generate_graph(w, h);
+
+
+
+
+// function choose_next_index(current_index){
+//   var legal_directions = [-w, +1, +w, -1];
+//   var next_index = null;
+//   var direction;
+//   // pop a random legal direction from the list of directions left on the node.
+//   while (legal_directions.length > 0) {
+//     direction = legal_directions.splice(Math.floor(Math.random()*legal_directions.length), 1)[0];
+//     next_index = current_index + direction;
+//     // edge cases and if its wall or visited, pass
+//     if (check_edges(next_index) || walls[next_index] || visited[next_index]) {continue;}
+//     else return next_index;
+//   }
+//   // pop the first random maybe maze
+//   var maybe_index = maybe_maze.splice(0, 1)[0];
+//   maybe_stats[maybe_index] = false;
+//   return maybe_index;
+// }
+
+// prims_generate_graph(w, h);
+
