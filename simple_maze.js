@@ -1,18 +1,18 @@
 "use strict";
 
-var w = 100;
-var h = 100;
+var w = 50;
+var h = 50;
 
-var pixel_width = w * cell_size;
-var pixel_height = h * cell_size;
+var pixel_width = w * cell_size*100;
+var pixel_height = w * cell_size*100;
 
 var directions = [-w, +1, +w, -1];
 
 var cell_size = 10;
 
 var canvas = d3.select("body").append("canvas")
-  .attr("width", w*cell_size)
-  .attr("height", h*cell_size);
+  .attr("width", w*cell_size +10)
+  .attr("height", h*cell_size +10);
 var context = canvas.node().getContext("2d");
 
 var walls = Array(w*h);
@@ -83,7 +83,7 @@ function prims_generate_graph(w, h) {
 }
 
 function check_edges(index) {
-  if (index < w || index % w === 0 || index > w*h ) {
+  if (index < w || index % w === 0 || index > w*h || (index+1)%w === 0) {
     fill_wall(index);
     walls[index] = true;
     return true;
@@ -104,7 +104,7 @@ function choose_next_index(current_index){
     if (check_edges(next_index) || walls[next_index] || visited[next_index]) {continue;}
     else return next_index;
   }
-  // if we run out of legal directions get a random from maybe maze.
+  // if we run out of legal directions get a random legal index from maybe_maze
   do {
     next_index = maybe_maze.stack.pop();
     delete maybe_maze[next_index];
