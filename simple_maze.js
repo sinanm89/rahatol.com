@@ -8,7 +8,7 @@ var pixel_height = w * cell_size*100;
 
 var directions = [-w, +1, +w, -1];
 
-var cell_size = 10;
+var cell_size = 8;
 
 var canvas = d3.select("body").append("canvas")
   .attr("width", w*cell_size +10)
