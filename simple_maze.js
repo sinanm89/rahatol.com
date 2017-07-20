@@ -9,10 +9,13 @@ var pixel_height = w * cell_size*100;
 var directions = [-w, +1, +w, -1];
 
 var cell_size = 6;
+// for some reason there is a 2 pixel padding from top and bottom..?
+var arbitrary_padding = -2;
 
 var canvas = d3.select("body").append("canvas")
   .attr("width", w*cell_size +10)
-  .attr("height", h*cell_size +10);
+  .attr("height", h*cell_size +10)
+  .attr("id", "myCanvas");
 var context = canvas.node().getContext("2d");
 
 var walls = Array(w*h);
@@ -21,7 +24,6 @@ var visited = Array(w*h);
 var maybe_maze = {
   'stack': [],
 };
-
 
 function fill_maze(i) {
   context.fillStyle = "#fff";
@@ -112,3 +114,62 @@ function choose_next_index(current_index){
 prims_generate_graph(w, h);
 
 
+// function call_button(i){
+//   if (wall[i]) fill_maybe_maze(i);
+//   if (!wall[i]) fill_wall(i);
+// }
+//put this outside the event loop..
+
+function fill_clicked_maze(evt, color) {
+    var rect = canvas.getBoundingClientRect();
+
+    // var x = i % cellWidth, y = i / cellWidth | 0;
+    context.fillStyle = color;
+    // var x_0 = (i%w) * cell_size;
+    // var y_0 = Math.floor(i/h) * cell_size;
+    // context.fillRect(x_0, y_0, cell_size, cell_size);
+    console.log(rect.top);
+    console.log(rect.left);
+    console.log(evt.clientX);
+    // console.log('client');
+    var cell_offsetX = evt.clientX % cell_size;
+    var cell_offsetY = evt.clientY % cell_size;
+    var y_0 = evt.clientY - rect.top - cell_offsetY - arbitrary_padding;
+    var x_0 = evt.clientX - rect.left - cell_offsetX - arbitrary_padding;
+    context.fillRect(x_0, y_0, cell_size, cell_size);
+    // return {
+    //   x: evt.clientX - rect.left,
+    //   y: evt.clientY - rect.top
+    // };
+  }
+// var context = canvas.getContext('2d');
+
+d3.select(window).on("mousemove", function() {
+  d3.select("body").append("canvas")
+      .attr("x", d3.event.clientX)
+      .attr("y", d3.event.clientY)
+      .attr("radius", 1)
+      .attr("strokeStyle", "green")
+    .transition()
+      .duration(2000)
+      .ease(Math.sqrt)
+      .attr("radius", 200)
+      .attr("strokeStyle", "red")
+      .remove();
+});
+
+
+// var canvas = document.getElementById('myCanvas');
+// canvas.addEventListener('mousedown', function(evt) {
+//     fill_clicked_maze(evt, "#f00");
+// }, false);
+
+
+// canvas.addEventListener('mousemove', function(evt) {
+    // fill_clicked_maze(evt, "#3f3");
+// });
+
+// canvas.addEventListener('click', function() {
+//   console.log('clik.');
+
+// }, false);
