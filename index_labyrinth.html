@@ -12,9 +12,22 @@
   button {
     position: absolute;
   }
+  #myCanvas {
+
+      padding: none;
+    margin: none;
+    display:block;
+  }
 </style>
 <body>
-
+<!-- <div style='background: white; font-size: 22px;'>
+posX-0: <b id="posX0">NADA</b>
+posY-0: <b id="posY0">NADA</b>
+</br>
+posX: <b id="posX">NADA</b>
+posY: <b id="posY">NADA</b>
+index: <b id="index">NADA</b>
+</div> -->
   <script src="https://d3js.org/d3.v3.min.js"></script>
   <script src="simple_maze.js"></script>
 
@@ -81,7 +94,7 @@ function custom(selection) {
     function draw(element) {
       switch (element.tagName) {
         case "circle": {
-          context.strokeStyle = element.getAttribute("strokeStyle");
+          context.strokeStyle =  element.getAttribute("strokeStyle");
           context.beginPath();
           context.arc(element.getAttribute("x"), element.getAttribute("y"), element.getAttribute("radius"), 0, 2 * Math.PI);
           context.stroke();
