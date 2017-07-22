@@ -1,0 +1,16 @@
+{
+    "name": "Rahatol.com",
+    "version": "0.0.1",
+    "license": "MIT",
+    "description": "using various algorithms to make something pretty.",
+    "main": "simple_maze.js",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/sinanm89/rahatol.com.git"
+    },
+    "dependencies": {
+    "jsonfile": "^3.0.0"
+  }
+
+
+}
